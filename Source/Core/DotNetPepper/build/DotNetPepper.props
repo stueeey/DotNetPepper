@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IncludeSource>false</IncludeSource>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DotNetPepper_PublishFiles Include="$(ProjectDir)**\*.dnp.cs"/>
+    <DotNetPepper_PublishFiles Remove="$(BaseIntermediateOutputPath)**\*.cs"/>
+  </ItemGroup>
+</Project>

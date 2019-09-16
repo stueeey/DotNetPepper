@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <Import Project="..\DotNetPepper.Test.Publisher\obj\PepperPacker\DotNetPepper.Test.Publisher.props" />
+
+  <!-- Project stuff here -->
+  
+  <Import Project="..\DotNetPepper.Test.Publisher\obj\PepperPacker\DotNetPepper.Test.Publisher.targets" />
+
+</Project>

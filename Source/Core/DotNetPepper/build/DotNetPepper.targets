@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" Condition="'$(MSBuildRuntimeType)'!='Core'">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <OutputFilename ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            File.WriteAllText(
+                OutputFilename,
+                Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="ReplaceFileText" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(MSBuildRuntimeType)'=='Core'">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <OutputFilename ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            File.WriteAllText(
+                OutputFilename,
+                Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="ReplaceStringContent" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" Condition="'$(MSBuildRuntimeType)'!='Core'">
+    <ParameterGroup>
+      <InputText ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="false" />
+      <ResultText ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            ResultText = Regex.Replace(InputText, MatchExpression, ReplacementText);
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="ReplaceStringContent" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(MSBuildRuntimeType)'=='Core'">
+    <ParameterGroup>
+      <InputText ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="false" />
+      <ResultText ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            ResultText = Regex.Replace(InputText, MatchExpression, ReplacementText);
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  
+  <Target Name="_GeneratePepperTargets" BeforeTargets="_PackPepperFiles">
+    <PropertyGroup>
+      <_DNP_SourcePath>$(MSBuildThisFileDirectory)PepperPacker\</_DNP_SourcePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <_DNP_ExistingStagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
+      <DotNetPepper_PublishFiles Remove="@(_DNP_ExistingStagedFiles)"/>
+    </ItemGroup>
+    <ReplaceStringContent InputText="$(PackageId)" MatchExpression="[^A-Za-z0-9_]" ReplacementText="_">
+      <Output TaskParameter="ResultText" PropertyName="NormalizedPackageId" />
+    </ReplaceStringContent>
+    <Message Text="Discovered DotNetPepper code file to publish: %(DotNetPepper_PublishFiles.Identity)"/>
+    <Delete Files="@(_DNP_ExistingStagedFiles)"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).props"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).targets"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)DotNetPepper\DotNetPepperPackagePacker.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)DotNetPepper\DotNetPepperPackagePacker.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets"/>
+    <ReplaceFileText 
+      InputFilename="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props" 
+      OutputFilename="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props"
+      MatchExpression="__DNP_PACKAGENAME__"
+      ReplacementText="$(NormalizedPackageId)"/>
+    <ReplaceFileText
+      InputFilename="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets"
+      OutputFilename="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets"
+      MatchExpression="__DNP_PACKAGENAME__"
+      ReplacementText="$(NormalizedPackageId)"/>
+    <Copy SourceFiles="@(DotNetPepper_PublishFiles)" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\Code\%(RecursiveDir)%(FileName).g%(Extension)"/>
+    
+  </Target>
+
+  <Target Name="_PackPepperFiles" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_DNP_StagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
+      <_PackageFiles Include="%(_DNP_StagedFiles.FullPath)"  PackagePath="build\%(RecursiveDir)%(FileName)%(Extension)"/>
+    </ItemGroup>
+    <Message Importance="High" Text="To include all CS files in your pepper package, add the following to your csproj:" Condition="@(DotNetPepper_PublishFiles) == ''"/>
+    <Message Importance="High" Text="   &lt;ItemGroup&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
+    <Message Importance="High" Text="     &lt;DotNetPepper_PublishFiles&gt;**\*.cs&lt;/DotNetPepper_PublishFiles&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
+    <Message Importance="High" Text="   &lt;/ItemGroup&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
+    <Error Text="No DotNetPepper code files found - you can add them by naming your code files with the extension .dnp.cs or explicitly add them to DotNetPepper_PublishFiles. See output for more details." Condition="@(DotNetPepper_PublishFiles) == ''"/>
+    <Message Importance="Normal" Text="Packing Pepper files:" />
+    <Message Importance="Normal" Text="   %(_PackageFiles.Identity) => %(_PackageFiles.PackagePath)" />
+  </Target>
+</Project>

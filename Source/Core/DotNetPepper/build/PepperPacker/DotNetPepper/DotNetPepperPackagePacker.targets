@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="_Gather__DNP_PACKAGENAME___DotNetPepperCodeFiles" BeforeTargets="__DNP_PACKAGENAME___AddDotNetPepperFilesForCompile">
+    <ItemGroup>
+      <__DNP_PACKAGENAME___SourceFiles Include="$(MSBuildThisFileDirectory)\Code\**\*.cs"/>
+      <__DNP_PACKAGENAME___OldSourceFiles Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.*"/>
+    </ItemGroup>
+    <Delete Files="@(__DNP_PACKAGENAME___OldSourceFiles)"/>
+    <Copy SourceFiles="@(__DNP_PACKAGENAME___SourceFiles)" UseHardlinksIfPossible="true" DestinationFolder="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\%(RecursiveDir)" SkipUnchangedFiles="true"/>
+  </Target>
+  <Target Name="__DNP_PACKAGENAME___AddDotNetPepperFilesForCompile" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Compile Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.cs"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_Clean__DNP_PACKAGENAME__PepperCodeFiles" BeforeTargets="CoreClean">
+    <ItemGroup>
+      <DotNetPepper_IntermediateFiles Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\*.cs"/>
+    </ItemGroup>
+    <Delete Files="@(DotNetPepper_IntermediateFiles)"/>
+  </Target>
+</Project>
