@@ -1,0 +1,50 @@
+trigger:
+  - master
+  - release/*
+
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_HOME: "/Temp"
+
+jobs:
+  - job: BuildAndPublishToNuget
+    steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: "sdk"
+          version: "2.2.204"
+      - powershell: dotnet restore './DotNetPepper.sln' --verbosity minimal
+        displayName: Restore
+        name: Restore
+        failOnStderr: true
+      - powershell: dotnet build './DotNetPepper.sln' --configuration $(Configuration) --verbosity minimal
+        displayName: Build
+        name: Build
+        failOnStderr: true
+      - powershell: dotnet test './DotNetPepper.sln' --configuration $(Configuration) --collect:"Code Coverage" --no-build --logger trx --verbosity normal
+        displayName: Test
+        name: Test
+        failOnStderr: true
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: VSTest
+          testResultsFiles: "**/*.trx"
+      - powershell: if (-not Item-Exists){
+
+          }
+          Copy-Item -Path ".\Source\Core\DotNetPepper\bin\Debug\*.nupkg" -Destination ".\Packages\"
+        displayName: Copy Packages
+        name: CopyPackages
+        failOnStderr: true
+      - task: PublishBuildArtifacts@1
+        displayName: Publish deploy artifacts
+        condition: succeededOrFailed()
+      - task: PowerShell@2
+        displayName: Push Nuget Packages
+        inputs:
+          targetType: filepath
+          filePath: '.\NugetPackages\PushNugetPackages.ps1'
+          arguments: -Feed $(InternalFeed) -FeedKey $(InternalFeedKey) -PersonalAccessToken $(PersonalAccessToken)
+          name: PushNugetPackages
+          failOnStderr: true
