@@ -8,8 +8,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetPepper", "Source\Core\DotNetPepper\DotNetPepper.csproj", "{A037D457-66E9-4DAF-9CB7-DAB1016930EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetPepper.Test.Publisher", "Source\Core\DotNetPepper.Test.Publisher\DotNetPepper.Test.Publisher.csproj", "{F987A5DC-8E36-4CD5-94F9-87DF731EE27A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A037D457-66E9-4DAF-9CB7-DAB1016930EC} = {A037D457-66E9-4DAF-9CB7-DAB1016930EC}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetPepper.Test.Consumer", "Source\Core\DotNetPepper.Test.Consumer\DotNetPepper.Test.Consumer.csproj", "{759A3EBF-E675-4C46-8CFC-FB40C9A76FE2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F987A5DC-8E36-4CD5-94F9-87DF731EE27A} = {F987A5DC-8E36-4CD5-94F9-87DF731EE27A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
