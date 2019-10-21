@@ -91,7 +91,7 @@
       <_DNP_ExistingStagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
       <DotNetPepper_PublishFiles Remove="@(_DNP_ExistingStagedFiles)"/>
     </ItemGroup>
-    <ReplaceStringContent InputText="$(PackageId)" MatchExpression="[^A-Za-z0-9_]" ReplacementText="_">
+    <ReplaceStringContent InputText="$(PackageId).$(PepperPostFix)" MatchExpression="[^A-Za-z0-9_]" ReplacementText="_">
       <Output TaskParameter="ResultText" PropertyName="NormalizedPackageId" />
     </ReplaceStringContent>
     <Message Text="Discovered DotNetPepper code file to publish: %(DotNetPepper_PublishFiles.Identity)"/>
@@ -114,7 +114,7 @@
     
   </Target>
 
-  <Target Name="_PackPepperFiles" BeforeTargets="GenerateNuspec">
+  <Target Name="_PackPepperFiles" BeforeTargets="_PepperPackagePacker">
     <ItemGroup>
       <_DNP_StagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
       <_PackageFiles Include="%(_DNP_StagedFiles.FullPath)"  PackagePath="build\%(RecursiveDir)%(FileName)%(Extension)"/>
@@ -126,5 +126,66 @@
     <Error Text="No DotNetPepper code files found - you can add them by naming your code files with the extension .dnp.cs or explicitly add them to DotNetPepper_PublishFiles. See output for more details." Condition="@(DotNetPepper_PublishFiles) == ''"/>
     <Message Importance="Normal" Text="Packing Pepper files:" />
     <Message Importance="Normal" Text="   %(_PackageFiles.Identity) => %(_PackageFiles.PackagePath)" />
+  </Target>
+  <Target Name="_PepperPackagePacker" AfterTargets="Pack" Condition="'$(PepperPacked)' != 'True'">
+    <Message Importance="High" Text="Hi $(PackageId)"/>
+    <PackTask PackItem="$(PackProjectInputFile)"
+              PackageFiles="@(_PackageFiles)"
+              PackageFilesToExclude="@(_PackageFilesToExclude)"
+              PackageVersion="$(PackageVersion)"
+              PackageId="$(PackageId).$(PepperPostFix)"
+              Title="$(Title) (Code-Only)"
+              Authors="$(Authors)"
+              Description="$(PackageDescription)"
+              Copyright="$(Copyright)"
+              RequireLicenseAcceptance="$(PackageRequireLicenseAcceptance)"
+              LicenseUrl="$(PackageLicenseUrl)"
+              ProjectUrl="$(PackageProjectUrl)"
+              IconUrl="$(PackageIconUrl)"
+              ReleaseNotes="$(PackageReleaseNotes)"
+              Tags="$(PackageTags) DotNetPepper"
+              DevelopmentDependency="$(DevelopmentDependency)"
+              BuildOutputInPackage="@(_BuildOutputInPackage)"
+              ProjectReferencesWithVersions="@(_ProjectReferencesWithVersions)"
+              TargetPathsToSymbols="@(_TargetPathsToSymbols)"
+              TargetFrameworks="@(_TargetFrameworks)"
+              FrameworksWithSuppressedDependencies="@(_FrameworksWithSuppressedDependencies)"
+              AssemblyName="$(AssemblyName)"
+              PackageOutputPath="$(PackageOutputAbsolutePath)"
+              IncludeSymbols="$(IncludeSymbols)"
+              IncludeSource="$(IncludeSource)"
+              PackageTypes="$(PackageType)"
+              IsTool="$(IsTool)"
+              RepositoryUrl="$(RepositoryUrl)"
+              RepositoryType="$(RepositoryType)"
+              RepositoryBranch="$(RepositoryBranch)"
+              RepositoryCommit="$(RepositoryCommit)"
+              SourceFiles="@(_SourceFiles->Distinct())"
+              NoPackageAnalysis="$(NoPackageAnalysis)"
+              NoDefaultExcludes="$(NoDefaultExcludes)"
+              MinClientVersion="$(MinClientVersion)"
+              Serviceable="$(Serviceable)"
+              FrameworkAssemblyReferences="@(_FrameworkAssemblyReferences)"
+              ContinuePackingAfterGeneratingNuspec="$(ContinuePackingAfterGeneratingNuspec)"
+              NuspecOutputPath="$(NuspecOutputAbsolutePath)"
+              IncludeBuildOutput="False"
+              BuildOutputFolders="$(BuildOutputTargetFolder)"
+              ContentTargetFolders="$(ContentTargetFolders)"
+              RestoreOutputPath="$(RestoreOutputAbsolutePath)"
+              NuspecFile="$(NuspecFileAbsolutePath)"
+              NuspecBasePath="$(NuspecBasePath)"
+              NuspecProperties="$(NuspecProperties)"
+              AllowedOutputExtensionsInPackageBuildOutputFolder="$(AllowedOutputExtensionsInPackageBuildOutputFolder)"
+              AllowedOutputExtensionsInSymbolsPackageBuildOutputFolder="$(AllowedOutputExtensionsInSymbolsPackageBuildOutputFolder)"
+              NoWarn="$(NoWarn)"
+              WarningsAsErrors="$(WarningsAsErrors)"
+              TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+              OutputFileNamesWithoutVersion="$(OutputFileNamesWithoutVersion)"
+              InstallPackageToOutputPath="$(InstallPackageToOutputPath)"
+              SymbolPackageFormat="$(SymbolPackageFormat)"
+              PackageLicenseFile="$(PackageLicenseFile)"
+              PackageLicenseExpression="$(PackageLicenseExpression)"
+              PackageLicenseExpressionVersion="$(PackageLicenseExpressionVersion)"
+    />
   </Target>
 </Project>
