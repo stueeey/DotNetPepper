@@ -96,8 +96,8 @@
     </ReplaceStringContent>
     <Message Text="Discovered DotNetPepper code file to publish: %(DotNetPepper_PublishFiles.Identity)"/>
     <Delete Files="@(_DNP_ExistingStagedFiles)"/>
-    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).props"/>
-    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).targets"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).$(PepperPostFix).props"/>
+    <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).$(PepperPostFix).targets"/>
     <Copy SourceFiles="$(_DNP_SourcePath)DotNetPepper\DotNetPepperPackagePacker.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props"/>
     <Copy SourceFiles="$(_DNP_SourcePath)DotNetPepper\DotNetPepperPackagePacker.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets"/>
     <ReplaceFileText 
@@ -117,7 +117,7 @@
   <Target Name="_PackPepperFiles" BeforeTargets="_PepperPackagePacker">
     <ItemGroup>
       <_DNP_StagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
-      <_PackageFiles Include="%(_DNP_StagedFiles.FullPath)"  PackagePath="build\%(RecursiveDir)%(FileName)%(Extension)"/>
+      <_PackageFiles Include="%(_DNP_StagedFiles.FullPath)"  PackagePath="build\%(RecursiveDir)%(FileName).g%(Extension)"/>
     </ItemGroup>
     <Message Importance="High" Text="To include all CS files in your pepper package, add the following to your csproj:" Condition="@(DotNetPepper_PublishFiles) == ''"/>
     <Message Importance="High" Text="   &lt;ItemGroup&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
@@ -127,8 +127,8 @@
     <Message Importance="Normal" Text="Packing Pepper files:" />
     <Message Importance="Normal" Text="   %(_PackageFiles.Identity) => %(_PackageFiles.PackagePath)" />
   </Target>
-  <Target Name="_PepperPackagePacker" AfterTargets="Pack" Condition="'$(PepperPacked)' != 'True'">
-    <Message Importance="High" Text="Hi $(PackageId)"/>
+
+  <Target Name="_PepperPackagePacker" AfterTargets="Pack" >
     <PackTask PackItem="$(PackProjectInputFile)"
               PackageFiles="@(_PackageFiles)"
               PackageFilesToExclude="@(_PackageFilesToExclude)"
@@ -144,7 +144,7 @@
               IconUrl="$(PackageIconUrl)"
               ReleaseNotes="$(PackageReleaseNotes)"
               Tags="$(PackageTags) DotNetPepper"
-              DevelopmentDependency="$(DevelopmentDependency)"
+              DevelopmentDependency="true"
               BuildOutputInPackage="@(_BuildOutputInPackage)"
               ProjectReferencesWithVersions="@(_ProjectReferencesWithVersions)"
               TargetPathsToSymbols="@(_TargetPathsToSymbols)"
@@ -152,8 +152,8 @@
               FrameworksWithSuppressedDependencies="@(_FrameworksWithSuppressedDependencies)"
               AssemblyName="$(AssemblyName)"
               PackageOutputPath="$(PackageOutputAbsolutePath)"
-              IncludeSymbols="$(IncludeSymbols)"
-              IncludeSource="$(IncludeSource)"
+              IncludeSymbols="false"
+              IncludeSource="false"
               PackageTypes="$(PackageType)"
               IsTool="$(IsTool)"
               RepositoryUrl="$(RepositoryUrl)"
@@ -161,7 +161,7 @@
               RepositoryBranch="$(RepositoryBranch)"
               RepositoryCommit="$(RepositoryCommit)"
               SourceFiles="@(_SourceFiles->Distinct())"
-              NoPackageAnalysis="$(NoPackageAnalysis)"
+              NoPackageAnalysis="true"
               NoDefaultExcludes="$(NoDefaultExcludes)"
               MinClientVersion="$(MinClientVersion)"
               Serviceable="$(Serviceable)"

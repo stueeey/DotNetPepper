@@ -5,13 +5,24 @@
       <__DNP_PACKAGENAME___SourceFiles Include="$(MSBuildThisFileDirectory)\Code\**\*.cs"/>
       <__DNP_PACKAGENAME___OldSourceFiles Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.*"/>
     </ItemGroup>
+    <!-- Ensure any old code files are removed (they may no longer be shipped) -->
     <Delete Files="@(__DNP_PACKAGENAME___OldSourceFiles)"/>
-    <Copy SourceFiles="@(__DNP_PACKAGENAME___SourceFiles)" UseHardlinksIfPossible="true" DestinationFolder="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\%(RecursiveDir)" SkipUnchangedFiles="true"/>
+    <!-- No hard links as consumers may make changes to these files to experiment, not realising that they are also changing the golden copy -->
+    <Copy SourceFiles="@(__DNP_PACKAGENAME___SourceFiles)" UseHardlinksIfPossible="false" DestinationFolder="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\%(RecursiveDir)" SkipUnchangedFiles="true"/>
   </Target>
+
+  <Target Name="_Gather__DNP_PACKAGENAME___DotNetPepperCodeFiles_DesignTime" BeforeTargets="CompileDesignTime">
+    <!-- This enables intellisense to see the code files before build in visual studio -->
+    <CallTarget Targets="_Gather__DNP_PACKAGENAME___DotNetPepperCodeFiles"/>
+  </Target>
+
   <Target Name="__DNP_PACKAGENAME___AddDotNetPepperFilesForCompile" BeforeTargets="CoreCompile">
     <ItemGroup>
-      <Compile Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.cs"/>
+        <DotNetPepper___DNP_PACKAGENAME___IntermediateFiles Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.cs"/>
+        <Compile Include="$(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.cs"/>
     </ItemGroup>
+    <Message Importance="Normal" Text="Scanning for code files in $(BaseIntermediateOutputPath)DotNetPepper\__DNP_PACKAGENAME__\**\*.cs" />
+    <Message Importance="Normal" Text="    Adding %(DotNetPepper___DNP_PACKAGENAME___IntermediateFiles.Identity)" />
   </Target>
 
   <Target Name="_Clean__DNP_PACKAGENAME__PepperCodeFiles" BeforeTargets="CoreClean">

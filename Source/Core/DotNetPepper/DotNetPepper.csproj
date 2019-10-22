@@ -12,10 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="build\DotNetPepper.props">
       <Pack>true</Pack>
       <PackagePath>build\DotNetPepper.props</PackagePath>
@@ -26,6 +22,25 @@
       <PackagePath>build\DotNetPepper.targets</PackagePath>
     </None>
 
+    <None Include="build\PepperPacker\__DNP_PACKAGENAME__.props">
+      <Pack>true</Pack>
+      <PackagePath>build\PepperPacker\__DNP_PACKAGENAME__.props</PackagePath>
+    </None>
+
+    <None Include="build\PepperPacker\__DNP_PACKAGENAME__.targets">
+      <Pack>true</Pack>
+      <PackagePath>build\PepperPacker\__DNP_PACKAGENAME__.targets</PackagePath>
+    </None>
+
+    <None Include="build\PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props">
+      <Pack>true</Pack>
+      <PackagePath>build\PepperPacker\DotNetPepper\DotNetPepperPackagePacker.props</PackagePath>
+    </None>
+
+    <None Include="build\PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets">
+      <Pack>true</Pack>
+      <PackagePath>build\PepperPacker\DotNetPepper\DotNetPepperPackagePacker.targets</PackagePath>
+    </None>
     
   </ItemGroup>
   
