@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeSource>false</IncludeSource>
+    <Version>1.0.0</Version>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -43,5 +44,9 @@
     </None>
     
   </ItemGroup>
+
+  <Target Name="SetBuildName" AfterTargets="Pack">
+      <Message Importance="High" Text="Write-Host &quot;##vso[build.updatebuildnumber]DotNetPepper $(Version)&quot;"/>
+  </Target>
   
 </Project>
