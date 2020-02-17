@@ -6,6 +6,9 @@
     <Version>1.0.0</Version>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Stuart Wilson</Authors>
+    <Description>Enables publishing code-only nuget packages (like static libs for c#)</Description>
+    <PackageTags>DotNetPepper;Static lib;Msbuild</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
