@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <DefineConstants>FLOOM</DefineConstants>
+    </PropertyGroup>
+
+    <!-- 
+    Under the covers if you reference a nuget package with targets and props in them it will inject
+    Import statements similar to these into your project. Would be great to find a way to hack it so that 
+    MSBuild thinks we are referencing a package emitted by the build, but this will have to do for now
+    -->
+    <Import Project="..\DotNetPepper.Tests.Publisher\obj\PepperPacker\DotNetPepper.Tests.Publisher.Pepper.props" />
+    
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="1.3.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <!-- See comment above -->
+    <Import Project="..\DotNetPepper.Tests.Publisher\obj\PepperPacker\DotNetPepper.Tests.Publisher.Pepper.targets" />
+
+    <!-- This project can't have a direct dependency on publisher because it gets upset that everything is double-defined -->
+    <Target Name="AlwaysBuildPublisher" BeforeTargets="PreBuildEvent">
+        <MSBuild Projects="..\DotNetPepper.Tests.Publisher\DotNetPepper.Tests.Publisher.csproj" />
+    </Target>
+    
+</Project>

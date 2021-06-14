@@ -94,7 +94,8 @@
     <ReplaceStringContent InputText="$(PackageId).$(PepperPostFix)" MatchExpression="[^A-Za-z0-9_]" ReplacementText="_">
       <Output TaskParameter="ResultText" PropertyName="NormalizedPackageId" />
     </ReplaceStringContent>
-    <Message Text="Discovered DotNetPepper code file to publish: %(DotNetPepper_PublishFiles.Identity)"/>
+    <Message Text="Discovered DotNetPepper code files to publish:"/>
+    <Message Text="    %(DotNetPepper_PublishFiles.Identity)"/>
     <Delete Files="@(_DNP_ExistingStagedFiles)"/>
     <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.props" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).$(PepperPostFix).props"/>
     <Copy SourceFiles="$(_DNP_SourcePath)__DNP_PACKAGENAME__.targets" DestinationFiles="$(BaseIntermediateOutputPath)PepperPacker\$(PackageId).$(PepperPostFix).targets"/>
@@ -119,7 +120,22 @@
       <_DNP_StagedFiles Include="$(BaseIntermediateOutputPath)PepperPacker\**"/>
       <_PackageFiles Include="%(_DNP_StagedFiles.FullPath)"  PackagePath="build\%(RecursiveDir)%(FileName).g%(Extension)"/>
     </ItemGroup>
-    <Message Importance="High" Text="To include all CS files in your pepper package, add the following to your csproj:" Condition="@(DotNetPepper_PublishFiles) == ''"/>
+      <!-- 
+      If you are seeing this then you probably clicked on the warning below
+      To add files to your code-only package - either:
+      
+      1) Postfix them with .dnp.cs e.g. MyClass.dnp.cs
+      
+      OR
+      
+      2) To include all cs files in your package, add the following to your project file:
+     
+     <ItemGroup>
+        <DotNetPepper_PublishFiles>**\*.cs</DotNetPepper_PublishFiles>
+     </ItemGroup>
+      
+      -->
+    <Warning Text="To include all CS files in your pepper package, add the following to your csproj:" Condition="@(DotNetPepper_PublishFiles) == ''"/>
     <Message Importance="High" Text="   &lt;ItemGroup&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
     <Message Importance="High" Text="     &lt;DotNetPepper_PublishFiles&gt;**\*.cs&lt;/DotNetPepper_PublishFiles&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>
     <Message Importance="High" Text="   &lt;/ItemGroup&gt;" Condition="@(DotNetPepper_PublishFiles) == ''"/>

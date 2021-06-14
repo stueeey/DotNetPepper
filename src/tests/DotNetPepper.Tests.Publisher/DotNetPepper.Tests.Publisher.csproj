@@ -5,7 +5,7 @@
     <Version>1.0.3</Version>
   </PropertyGroup>
 
-  <Import Project="..\DotNetPepper\build\DotNetPepper.props" />
-  <Import Project="..\DotNetPepper\build\DotNetPepper.targets" />
+  <Import Project="..\..\core\DotNetPepper\build\DotNetPepper.props" />
+  <Import Project="..\..\core\DotNetPepper\build\DotNetPepper.targets" />
 
 </Project>
